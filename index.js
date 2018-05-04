@@ -186,16 +186,22 @@ function getRemoteDocument (url, options) {
     // If there is no content processor, default to processing the raw response as JSON
     if (_.isUndefined(loaderOptions.processContent)) {
       loaderOptions.processContent = function (res, callback) {
+        console.log('RECEIVED RESPONSE');
+        console.log(res);
+        console.log(res.text);
         callback(undefined, JSON.parse(res.text));
       };
     }
 
+    console.log('LOADING WITH PATH LOADER');
     // Attempt to load the resource using path-loader
     allTasks = PathLoader.load(decodeURI(url), loaderOptions);
 
     // Update the cache
     allTasks = allTasks
       .then(function (res) {
+        console.log('RECEIVED RESPONSE');
+        console.log(res);
         remoteCache[url] = {
           value: res
         };
@@ -203,6 +209,8 @@ function getRemoteDocument (url, options) {
         return res;
       })
       .catch(function (err) {
+        console.log('PATH ERROR');
+        console.log(err);
         remoteCache[url] = {
           error: err
         };
@@ -210,6 +218,7 @@ function getRemoteDocument (url, options) {
         throw err;
       });
   } else {
+    console.log('FETCH FROM CACHE');
     // Return the cached version
     allTasks = allTasks.then(function () {
       if (_.isError(cacheEntry.error)) {
@@ -382,6 +391,8 @@ function buildRefModel (document, options, metadata) {
                 // We have no cache so we must retrieve the document
                 return getRemoteDocument(rAbsLocation, nOptions)
                         .catch(function (err) {
+                          console.log('FETCH ERROR;');
+                          console.log(err);
                           // Store the response in the document cache
                           nMetadata.docs[rAbsLocation] = err;
 
