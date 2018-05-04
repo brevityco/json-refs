@@ -1139,10 +1139,12 @@ function pathToPtr (path, hashPrefix) {
  *   });
  */
 function resolveRefs (obj, options) {
+  console.log('JSON-REF BEGINNING RESOLUTION');
   var allTasks = Promise.resolve();
 
   allTasks = allTasks
     .then(function () {
+      console.log('task 1');
       // Validate the provided document
       if (!_.isArray(obj) && !_.isObject(obj)) {
         throw new TypeError('obj must be an Array or an Object');
@@ -1155,6 +1157,7 @@ function resolveRefs (obj, options) {
       obj = _.cloneDeep(obj);
     })
     .then(function () {
+      console.log('task 2');
       var metadata = {
         deps: {}, // To avoid processing the same refernece twice, and for circular reference identification
         docs: {}, // Cache to avoid processing the same document more than once
@@ -1167,6 +1170,7 @@ function resolveRefs (obj, options) {
         });
     })
     .then(function (results) {
+      console.log('task 3');
       var allRefs = {};
       var circularPaths = [];
       var circulars = [];
@@ -1181,6 +1185,7 @@ function resolveRefs (obj, options) {
         depGraph.setNode(node);
       });
 
+      console.log('add edges')
       // Add edges
       _.forOwn(results.deps, function (props, node) {
         _.forOwn(props, function (dep) {
@@ -1190,6 +1195,7 @@ function resolveRefs (obj, options) {
 
       circularPaths = gl.alg.findCycles(depGraph);
 
+      console.log('create list of circulars');
       // Create a unique list of circulars
       circularPaths.forEach(function (path) {
         path.forEach(function (seg) {
@@ -1199,6 +1205,7 @@ function resolveRefs (obj, options) {
         });
       });
 
+      console.log('process circulars');
       // Process circulars
       _.forOwn(results.deps, function (props, node) {
         _.forOwn(props, function (dep, prop) {
@@ -1245,6 +1252,7 @@ function resolveRefs (obj, options) {
         });
       });
 
+      console.log('resolve references');
       // Resolve the references in reverse order since the current order is top-down
       _.forOwn(Object.keys(results.deps).reverse(), function (parentPtr) {
         var deps = results.deps[parentPtr];
@@ -1284,6 +1292,7 @@ function resolveRefs (obj, options) {
       });
 
       function walkRefs (root, refPtr, refPath) {
+        console.log('walk refs');
         var refPtrParts = refPtr.split('#');
         var refDetails = results.refs[refPtr];
         var refDeps;
@@ -1328,6 +1337,7 @@ function resolveRefs (obj, options) {
       // that if we want to provide the full picture as to what paths in the resolved document were created as a result
       // of a reference, we have to take our fully-qualified reference locations and expand them to be all local based
       // on the original document.
+      console.log('process document')
       Object.keys(results.refs).forEach(function (refPtr) {
         // We only want to process references found at or beneath the provided document and sub-document path
         if (refPtr.indexOf(refsRoot) !== 0) {
@@ -1355,6 +1365,7 @@ function resolveRefs (obj, options) {
       };
     });
 
+  console.log('JSON-REF completed');
   return allTasks;
 }
 
