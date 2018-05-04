@@ -69,7 +69,7 @@
     "js-yaml": "^3.10.0",
     "lodash": "^4.17.4",
     "native-promise-only": "^0.8.1",
-    "path-loader": "^1.0.4",
+    "path-loader": "https://github.com/brevityco/path-loader.git",
     "slash": "^1.0.0",
     "uri-js": "^3.0.2"
   }
