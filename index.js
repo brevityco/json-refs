@@ -176,6 +176,8 @@ function getRefType (refDetails) {
 }
 
 function getRemoteDocument (url, options) {
+  console.log('getting remote document');
+  console.log(url);
   var cacheEntry = remoteCache[url];
   var allTasks = Promise.resolve();
   var loaderOptions = _.cloneDeep(options.loaderOptions || {});
@@ -310,6 +312,7 @@ function buildRefModel (document, options, metadata) {
   var refs;
   var rOptions;
 
+  console.log('BUILDING REF MODEL');
   // Store the document in the metadata if necessary
   if (_.isUndefined(metadata.docs[absLocation])) {
     metadata.docs[absLocation] = document;
@@ -321,6 +324,9 @@ function buildRefModel (document, options, metadata) {
 
     // Find the references based on the options
     refs = findRefs(document, options);
+
+    console.log('FOUND REFS');
+    console.log(refs);
 
     // Iterate over the references and process
     _.forOwn(refs, function (refDetails, refPtr) {
@@ -359,6 +365,7 @@ function buildRefModel (document, options, metadata) {
 
       // Resolve the reference
       if (isRemote(refDetails)) {
+        console.log('CONFIRMED REMOTE');
         // Delete filter.options because all remote references should be fully resolved
         delete rOptions.filter;
         // The new location being referenced
@@ -371,6 +378,7 @@ function buildRefModel (document, options, metadata) {
               var rDoc = nMetadata.docs[rAbsLocation];
 
               if (_.isUndefined(rDoc)) {
+                console.log('FETCHING REMOTES');
                 // We have no cache so we must retrieve the document
                 return getRemoteDocument(rAbsLocation, nOptions)
                         .catch(function (err) {
@@ -1166,6 +1174,8 @@ function resolveRefs (obj, options) {
 
       return buildRefModel(obj, options, metadata)
         .then(function () {
+          console.log('returning metadata');
+          console.log(metadata);
           return metadata;
         });
     })
